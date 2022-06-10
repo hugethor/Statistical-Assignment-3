@@ -19,12 +19,16 @@ y_07 <- as.vector(y_2007)
 matrix_2008 <- as.matrix(x_2008)
 matrix_2007 <- as.matrix(x_2007)
 matrix_2008 <- cbind(matrix_2008, y_08)
-matrix_2008 <- as.matrix(matrix_2008)
 matrix_2007 <- cbind(matrix_2007, y_07)
-
+data2007 <- as.data.frame(matrix_2007)
+data2008 <- as.data.frame(matrix_2008)
 # Creating the sequence & combinations
 seq <- seq(20)
 combinations_4 <- combn(seq, 4)
 combinations_3 <- combn(seq, 3)
 combinations_2 <- combn(seq, 2)
+
+data2008.result.lm <- lm(result ~ V1 + V2, data = data2008)
+summary(data2008.result.lm)
+
 
