@@ -23,7 +23,13 @@ combinations_4 <- combn(seq(20), 4)
 combinations_3 <- combn(seq(20), 3)
 combinations_2 <- combn(seq(20), 2)
 
-data_2008.result.lm <- lm(result ~ V1 + V2, data = data_2008)
+data_2008.result.lm <- train(result ~ V1 + V2, data = data_2008, method = "lm",trControl = ctrl)
 summary(data_2008.result.lm)
+
+#Getting RMSE
+print(data_2008.result.lm[["results"]][["RMSE"]])
+
+#measuring error
+ctrl <- trainControl(method = "LOOCV")
 
 
