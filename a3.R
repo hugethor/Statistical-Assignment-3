@@ -25,27 +25,30 @@ combinations_4 <- combn(predictors, 4)
 combinations_3 <- combn(predictors, 3)
 combinations_2 <- combn(predictors, 2)
 
-error = c()
+error1 = c()
+a <- 1
 y_new = c()
 for (i in predictors){
   print("for predictor:")
   model <- lm(paste("result ~", i), data = data_2008)
-  error[i] <- summary(model)$sigma
-  print(error[i])
+  error1[i] <- summary(model)$sigma
+  error1[i] <- (error1[i]^2 * 22)/24
+  print(error1[i])
 }
+
+model <- lm(result ~ V1 + V2, data = data_2008)
 
 for (i in 1:ncol(combinations_2)){
-  x <- noquote(combinations_2[1,i])
-  y <- noquote(combinations_2[2,i])
-  x <- unlist(x)
-  y <- unlist(y)
-  print(x)
-  print(y)
-  model <- lm(paste("result ~", as.character(x+y)), data = data_2008)
-  print(summary(model)$sigma)
+  x <- combinations_2[1,i]
+  y <- combinations_2[2,i]
+  #x <- noquote(unlist(x))
+  #y <- noquote(unlist(y))
+  model <- lm(paste("result ~", x + y), data = data_2008)
+  # model <- lm(result ~ noquote(x) + noquote(y), data = data_2008)
 }
 
-# stuff from package
+summary(model)
+v# stuff from package
 
 data_2008.result.lm <- train(result ~ V1 + V2, data = data_2008, method = "lm",trControl = ctrl)
 summary(data_2008.result.lm)
