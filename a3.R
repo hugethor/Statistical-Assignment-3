@@ -2,6 +2,8 @@
 # formula given to us
 # y_new[i] <- c(1, x[i,])%*%lm(y[-i] ~ x[-i,]$coef)
 
+library(ggplot2)
+
 # Loading the predictors
 x_2008 <- read.table('subset2008.txt')
 x_2007 <- read.table('subset2007.txt')
@@ -38,7 +40,7 @@ for (i in predictors){
 
 # Model for 2 variables
 error2 <- c()
-predictor_list2 <- c()
+predictor2 <- c()
 for (i in 1:ncol(combinations_2)){
   x_var <- NULL
   x <- combinations_2[1,i]
@@ -47,7 +49,7 @@ for (i in 1:ncol(combinations_2)){
   y <- unlist(y)
   x_var <- paste(x_var, x, "+")
   x_var <- paste(x_var, y)
-  predictor_list2[i] <- x_var
+  predictor2[i] <- x_var
   form <- paste("result ~", x_var)
   model <- lm(form, data = data_2008)
   error2[i] <- summary(model)$sigma
@@ -57,7 +59,7 @@ for (i in 1:ncol(combinations_2)){
 
 # Model for 3 variables
 error3 <- c()
-predictor_list3 <- c()
+predictor3 <- c()
 for (i in 1:ncol(combinations_3)){
   x_var <- NULL
   x <- combinations_3[1,i]
@@ -69,7 +71,7 @@ for (i in 1:ncol(combinations_3)){
   x_var <- paste(x_var, x, "+")
   x_var <- paste(x_var, y, "+")
   x_var <- paste(x_var, z)
-  predictor_list3[i] <- x_var
+  predictor3[i] <- x_var
   form <- paste("result ~", x_var)
   model <- lm(form, data = data_2008)
   error3[i] <- summary(model)$sigma
@@ -79,7 +81,7 @@ for (i in 1:ncol(combinations_3)){
 
 # Model for 4 variables
 error4 <- c()
-predictor_list4 <- c()
+predictor4 <- c()
 for (i in 1:ncol(combinations_4)){
   x_var <- NULL
   x <- combinations_4[1,i]
@@ -94,7 +96,7 @@ for (i in 1:ncol(combinations_4)){
   x_var <- paste(x_var, y, "+")
   x_var <- paste(x_var, z, "+")
   x_var <- paste(x_var, w)
-  predictor_list4[i] <- x_var
+  predictor4[i] <- x_var
   form <- paste("result ~", x_var)
   model <- lm(form, data = data_2008)
   error4[i] <- summary(model)$sigma
@@ -102,18 +104,71 @@ for (i in 1:ncol(combinations_4)){
   print(error4[i])
 }
 
+# Create histograms for each model - 1 variable per model
+predictors <- c("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10", "V11", "V12", "V13", "V14", "V15", "V16", "V17", "V18", "V19", "V20")
+hist(error1, breaks = 20,
+     main="Error per model - 1 variable as predictor",
+     xlab="Errors per predictor",
+     freq=FALSE)
+
+# Create histograms for each model - 2 variables per model
+hist(error2, breaks = 190,
+     main="Error per model - 2 variables as predictors",
+     xlab="Errors per combinations of 2 variables",
+     freq=FALSE)
+
+# Create histograms for each model - 3 variables per model
+hist(error3, breaks = 1140,
+     main="Error per model - 3 variables as predictors",
+     xlab="Errors per combinations of 3 variables",
+     freq=FALSE)
+
+# Create histograms for each model - 4 variables per model
+hist(error4, breaks = 4845,
+     main="Error per model - 4 variables as predictors",
+     xlab="Errors per combinations of 4 variables",
+     freq=FALSE)
+
 # Check the best model
+min_1 <- min(error1)
+min_2 <- min(error2)
+min_3 <- min(error3)
+min_4 <- min(error4)
+min_error <- min(min_1,min_2,min_3,min_4)
+if (min_error == min_1){
+  index <- which(error1 == min_1)
+  best_model <- predictors[index]
+  print(best_model)
+} else {
+  if (min_error == min_2){
+    index <- which(error2 == min_2)
+    best_model <- predictor2[index]
+    print(best_model)
+  } else {
+    if (min_error == min_3) {
+      index <- which(error3 == min_3)
+      best_model <- predictor3[index]
+      print(best_model)
+    } else {
+      index <- which(error4 == min_4)
+      best_model <- predictor4[index]
+      print(best_model)
+    }
+  }
+}
 
-a <- min(error1)
-b <- min(error2)
-c <- min(error3)
-d <- min(error4)
+# Obtain coefficients for best model
+form <- paste("result ~", best_model)
+model <- lm(form, data = data_2008)
+coef_model <- summary(model)$coef
+# Y = beta0 + beta1*v10 + beta2*v13 + beta3*v17 + beta4*v20
+beta0 <- coef_model["(Intercept)", "Estimate"]
+beta1 <- coef_model["V10", "Estimate"]
+beta2 <- coef_model["V13", "Estimate"]
+beta3 <- coef_model["V17", "Estimate"]
+beta4 <- coef_model["V20", "Estimate"]
 
-error <- min(a,b,c,d)
 
-index <- which(error4 == d)
-print(index)
-best_model <- predictor_list4[index]
-print(best_model)
-print(d)
+
+
 
